@@ -1,4 +1,3 @@
-
 plugins {
 	id("org.springframework.boot") version "2.2.2.RELEASE"
 	id("io.spring.dependency-management") version "1.0.8.RELEASE"
@@ -25,4 +24,3 @@ dependencies {
 		exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
 	}
 }
-
