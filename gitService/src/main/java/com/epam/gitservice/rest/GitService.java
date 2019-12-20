@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/git")
-public class gitService {
+public class GitService {
     private static final String GIT_EXTENSION = ".git";
     private static final String SLASH = "/";
 
