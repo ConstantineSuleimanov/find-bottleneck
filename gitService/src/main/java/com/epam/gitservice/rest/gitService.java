@@ -1,8 +1,10 @@
 package com.epam.gitservice.rest;
 
 import com.epam.gitservice.jsonTemplate.request.GitRequest;
+import com.epam.gitservice.jsonTemplate.response.ErrorResponse;
 import com.epam.gitservice.jsonTemplate.response.GitInfoResponse;
 import com.epam.gitservice.jsonTemplate.response.GitPullResponse;
+import com.epam.gitservice.jsonTemplate.response.Response;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
@@ -28,26 +30,25 @@ public class gitService {
 
     @PostMapping(value = "update", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    GitPullResponse updateRepository(@RequestBody GitRequest request) {
-        GitPullResponse response = new GitPullResponse();
+    Response updateRepository(@RequestBody GitRequest request) {
         try {
             Git git = Git.open(new File(SLASH + request.getUserId() + SLASH + request.getRepositoryName() + SLASH + GIT_EXTENSION));
             git.pull();
-            response.setResultCode(0);
+            GitPullResponse response = new GitPullResponse();
+            response.setResultCode(HttpStatus.OK);
             return response;
         } catch (IOException e) {
             //TODO: Error Handler
-            response.setError(new GitPullResponse.Error(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
-            return response;
+            return new ErrorResponse(HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping(value = "/repositoriesInfo", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    GitInfoResponse getAllRepositoryInfo(@RequestBody GitRequest request) {
-        GitInfoResponse infoResponse = new GitInfoResponse();
-        List<GitInfoResponse.Repository> repositoryList = new ArrayList<>();
+    Response getAllRepositoryInfo(@RequestBody GitRequest request) {
         try {
+            GitInfoResponse response = new GitInfoResponse();
+            List<GitInfoResponse.Repository> repositoryList = new ArrayList<>();
             String userFolderPath = SLASH + request.getUserId();
             File userFolder = new File(userFolderPath);
             for (String repositoryFolder : userFolder.list()) {
@@ -58,34 +59,32 @@ public class gitService {
                 repository.setCurrentBranch(git.getRepository().getBranch());
                 repositoryList.add(repository);
             }
-            infoResponse.setRepositoryList(repositoryList);
-            infoResponse.setResultCode(0);
-            return infoResponse;
+            response.setRepositoryList(repositoryList);
+            response.setResultCode(HttpStatus.OK);
+            return response;
         } catch (IOException | GitAPIException e) {
             //TODO: Error Handler
-            infoResponse.setError(new GitInfoResponse.Error(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
-            return infoResponse;
+            return new ErrorResponse(HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping(value = "/info", consumes = "application/json", produces = "application/json")
     public @ResponseBody
-    GitInfoResponse getRepositoryInfo(@PathVariable String repositoryName, @RequestBody GitRequest request) {
-        GitInfoResponse infoResponse = new GitInfoResponse();
+    Response getRepositoryInfo(@RequestBody GitRequest request) {
         try {
+            GitInfoResponse response = new GitInfoResponse();
             String repositoryFolder = SLASH + request.getUserId() + SLASH + request.getRepositoryName() + SLASH + GIT_EXTENSION;
             Git git = Git.open(new File(repositoryFolder));
             GitInfoResponse.Repository repository = new GitInfoResponse.Repository();
             repository.setBranchList(getBranchList(git.branchList().call()));
             repository.setRepositoryName(repositoryFolder);
             repository.setCurrentBranch(git.getRepository().getBranch());
-            infoResponse.setRepository(repository);
-            infoResponse.setResultCode(0);
-            return infoResponse;
+            response.setRepository(repository);
+            response.setResultCode(HttpStatus.OK);
+            return response;
         } catch (IOException | GitAPIException e) {
             //TODO: Error Handler
-            infoResponse.setError(new GitInfoResponse.Error(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()));
-            return infoResponse;
+            return new ErrorResponse(HttpStatus.BAD_REQUEST);
         }
     }
 

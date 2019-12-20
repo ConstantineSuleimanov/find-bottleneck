@@ -9,19 +9,10 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GitInfoResponse {
+public class GitInfoResponse extends Response {
     private int resultCode;
-    private Error error;
     private List<Repository> repositoryList;
     private Repository repository;
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Error{
-        private int errorCode;
-        private String errorMessage;
-    }
 
     @Data
     @AllArgsConstructor
