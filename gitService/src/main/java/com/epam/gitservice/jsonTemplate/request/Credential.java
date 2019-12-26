@@ -7,11 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GitRequest {
+class Credential {
     private String userId;
-    private String repositoryName;
-    private String branchName;
-    private boolean newBranch = false;
-    private String repositoryUrl;
-    private Credential credential;
+    private String password;
 }
