@@ -48,12 +48,24 @@ public class GitService {
         try {
             Git git = Git.open(new File(getGitFolder(request)));
             git.pull();
-            GitPullResponse response = new GitPullResponse();
-            response.setResultCode(HttpStatus.OK);
-            return response;
+            return new GitPullResponse(HttpStatus.OK);
         } catch (IOException e) {
             //TODO: Error Handler
             return new ErrorResponse(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping(value = "/checkout", consumes = "application/json", produces = "application/json")
+    public @ResponseBody
+    Response checkoutRepository(@RequestBody GitRequest request){
+        try {
+            Git git = Git.open(new File(getGitFolder(request)));
+            git.checkout().setName(request.getBranchName()).setCreateBranch(request.isNewBranch()).call();
+            return new GitCheckoutResponse(HttpStatus.OK);
+        } catch (IOException e){
+            return new ErrorResponse(HttpStatus.BAD_REQUEST);
+        } catch (GitAPIException gae){
+            return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
